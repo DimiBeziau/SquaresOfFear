@@ -1,14 +1,38 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class CreatingLevel : MonoBehaviour
 {
     public GameObject basicCube;
 
+    public static float timer = 0f;
+    private float advanceInterval = 3f;
+    private float cubeSpeed = 1f;
+
     private int currentLevel = 1;
+    private List<CubeMove> activeCubes = new List<CubeMove>();
 
     void Start()
     {
         SpawnWave();
+    }
+
+    void Update()
+    {
+        timer += Time.deltaTime;
+
+        if (timer >= advanceInterval)
+        {
+            timer = 0f;
+            AdvanceCubes();
+        }
+    }
+
+    void AdvanceCubes()
+    {
+        activeCubes.RemoveAll(c => c == null);
+        foreach (CubeMove cube in activeCubes)
+            cube.cubeAdvance(cubeSpeed);
     }
 
     void SpawnWave()
@@ -21,7 +45,6 @@ public class CreatingLevel : MonoBehaviour
         }
 
         Level level = JsonUtility.FromJson<Level>(jsonFile.text);
-
         string[] rows = level.wave.Split('/');
 
         float floorCenterX = 1.5f;
@@ -31,7 +54,7 @@ public class CreatingLevel : MonoBehaviour
         for (int z = 0; z < rows.Length; z++)
         {
             string[] cols = rows[z].Split(' ');
-            float xOffset = floorCenterX - (cols.Length / 2f) + 0.5f;
+            float xOffset = Mathf.Round(floorCenterX - (cols.Length - 1) / 2f);
 
             for (int x = 0; x < cols.Length; x++)
             {
@@ -41,7 +64,9 @@ public class CreatingLevel : MonoBehaviour
                 if (type == 1)
                 {
                     GameObject cube = Instantiate(basicCube, pos, Quaternion.identity);
-                    cube.GetComponent<CubeMove>().kind = CubeMove.CubeKind.Basic;
+                    CubeMove cm = cube.GetComponent<CubeMove>();
+                    cm.kind = CubeMove.CubeKind.Basic;
+                    activeCubes.Add(cm);
                 }
             }
         }

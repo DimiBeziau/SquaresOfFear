@@ -11,11 +11,17 @@ public class PlayerMove : MonoBehaviour
     public Animator characterAnimator;
 
     private GameObject plane;
+    private MarkerTrigger _trigger;
 
     void Start()
     {
         _rb = GetComponent<Rigidbody>();
         _animator = characterAnimator != null ? characterAnimator : GetComponentInChildren<Animator>();
+
+        // Trigger invisible permanent, repositionné à chaque marquage
+        GameObject triggerObj = new GameObject("MarkerTriggerZone");
+        triggerObj.transform.SetParent(null);
+        _trigger = triggerObj.AddComponent<MarkerTrigger>();
     }
 
     void Update()
@@ -39,27 +45,29 @@ public class PlayerMove : MonoBehaviour
             _animator.SetBool("Grounded", true);
         }
 
-        if (Input.GetMouseButtonDown(0)) // clic gauche pour marquer la case
+        if (Input.GetMouseButtonDown(0)) // clic gauche : marquer la case
         {
             Destroy(plane);
-            RaycastHit[] hits = Physics.RaycastAll(transform.position + Vector3.up * 3f, Vector3.down);
-            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
-            foreach (RaycastHit h in hits)
-            {
-                if (h.collider.attachedRigidbody != _rb)
-                {
-                    plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
-                    Destroy(plane.GetComponent<MeshCollider>());
-                    plane.transform.localScale = new Vector3(0.1f, 1f, 0.1f);
-                    plane.GetComponent<Renderer>().material.color = Color.blue;
-                    plane.transform.position = new Vector3(
-                        Mathf.Round(transform.position.x),
-                        h.point.y + 0.01f,
-                        Mathf.Round(transform.position.z)
-                    );
-                    break;
-                }
-            }
+            Vector3 markerPos = new Vector3(
+                Mathf.Round(transform.position.x),
+                0.99f,
+                Mathf.Round(transform.position.z)
+            );
+            plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            Destroy(plane.GetComponent<MeshCollider>());
+            plane.transform.localScale = new Vector3(0.1f, 1f, 0.1f);
+            plane.GetComponent<Renderer>().material.color = Color.blue;
+            plane.transform.position = markerPos;
+
+            // Positionne le trigger au centre du cube (y+1 au dessus du sol)
+            _trigger.transform.position = new Vector3(markerPos.x, markerPos.y + 1f, markerPos.z);
+        }
+
+        if (Input.GetMouseButtonDown(1) && plane != null) // clic droit : déclencher
+        {
+            Destroy(plane);
+            plane = null;
+            _trigger.Activate(1f, 1f);
         }
 
         if (transform.position.y < -20)

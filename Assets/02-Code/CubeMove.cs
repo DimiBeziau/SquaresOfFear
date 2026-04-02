@@ -16,14 +16,45 @@ public class CubeMove : MonoBehaviour
     }
 
     public CubeKind kind;
-    public float gravity = 0f;
 
+    private Rigidbody _rb;
     private bool destroyed = false;
+
+    private bool isRolling = false;
+    private float rollProgress = 0f;
+    private float rollDuration = 0.5f;
+    private Vector3 rollStartPos;
+    private Quaternion rollStartRot;
+
+    void Start()
+    {
+        _rb = GetComponent<Rigidbody>();
+        if (_rb != null) _rb.isKinematic = true; // on contrôle le mouvement manuellement
+    }
 
     void Update()
     {
-        if (gravity != 0f)
-            transform.Translate(0, gravity * Time.deltaTime, 0, Space.World);
+        if (isRolling)
+        {
+            rollProgress += Time.deltaTime / rollDuration;
+            rollProgress = Mathf.Clamp01(rollProgress);
+
+            transform.position = Vector3.Lerp(rollStartPos, rollStartPos + Vector3.back, rollProgress);
+            transform.rotation = Quaternion.Lerp(rollStartRot, rollStartRot * Quaternion.Euler(-90f, 0f, 0f), rollProgress);
+
+            if (rollProgress >= 1f)
+                isRolling = false;
+        }
+
+        if (!isRolling && _rb != null && _rb.isKinematic)
+        {
+            bool overPlatform = Physics.Raycast(transform.position, Vector3.down, 5f, LayerMask.GetMask("Default"));
+            if (!overPlatform)
+            {
+                _rb.isKinematic = false;
+                _rb.useGravity = true;
+            }
+        }
 
         if (transform.position.y < -20f)
         {
@@ -31,6 +62,16 @@ public class CubeMove : MonoBehaviour
                 destroyedMistake++;
             Destroy(gameObject);
         }
+    }
+
+    public void cubeAdvance(float speed)
+    {
+        if (isRolling) return;
+        isRolling = true;
+        rollProgress = 0f;
+        rollDuration = 1f / speed;
+        rollStartPos = transform.position;
+        rollStartRot = transform.rotation;
     }
 
     public void ReactToHit(bool success)
@@ -43,10 +84,5 @@ public class CubeMove : MonoBehaviour
 
         countAudio++;
         Destroy(gameObject);
-    }
-
-    public void cubeFall()
-    {
-        gravity = -9.8f;
     }
 }
