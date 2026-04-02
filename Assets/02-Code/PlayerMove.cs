@@ -10,6 +10,8 @@ public class PlayerMove : MonoBehaviour
     private Vector3 _currentDirection = Vector3.zero;
     public Animator characterAnimator;
 
+    private GameObject plane;
+
     void Start()
     {
         _rb = GetComponent<Rigidbody>();
@@ -35,6 +37,29 @@ public class PlayerMove : MonoBehaviour
         {
             _animator.SetFloat("MoveSpeed", direction.magnitude);
             _animator.SetBool("Grounded", true);
+        }
+
+        if (Input.GetMouseButtonDown(0)) // clic gauche pour marquer la case
+        {
+            Destroy(plane);
+            RaycastHit[] hits = Physics.RaycastAll(transform.position + Vector3.up * 3f, Vector3.down);
+            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+            foreach (RaycastHit h in hits)
+            {
+                if (h.collider.attachedRigidbody != _rb)
+                {
+                    plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
+                    Destroy(plane.GetComponent<MeshCollider>());
+                    plane.transform.localScale = new Vector3(0.1f, 1f, 0.1f);
+                    plane.GetComponent<Renderer>().material.color = Color.blue;
+                    plane.transform.position = new Vector3(
+                        Mathf.Round(transform.position.x),
+                        h.point.y + 0.01f,
+                        Mathf.Round(transform.position.z)
+                    );
+                    break;
+                }
+            }
         }
 
         if (transform.position.y < -20)
