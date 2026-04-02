@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,6 +14,8 @@ public class PlayerMove : MonoBehaviour
     private GameObject plane;
     private MarkerTrigger _trigger;
 
+    public GameObject sphere;
+
     void Start()
     {
         _rb = GetComponent<Rigidbody>();
@@ -22,6 +25,7 @@ public class PlayerMove : MonoBehaviour
         GameObject triggerObj = new GameObject("MarkerTriggerZone");
         triggerObj.transform.SetParent(null);
         _trigger = triggerObj.AddComponent<MarkerTrigger>();
+        _trigger.spherePrefab = sphere;
     }
 
     void Update()
@@ -68,6 +72,34 @@ public class PlayerMove : MonoBehaviour
             Destroy(plane);
             plane = null;
             _trigger.Activate(1f, 1f);
+        }
+
+        if (Input.GetKeyDown(KeyCode.E) && _trigger.spawnedSpheres.Count > 0)
+        {
+            List<GameObject> toDetonate = new List<GameObject>(_trigger.spawnedSpheres);
+            _trigger.spawnedSpheres.Clear();
+
+            foreach (GameObject bomb in toDetonate)
+            {
+                if (bomb == null) continue;
+                RaycastHit[] hits = Physics.SphereCastAll(bomb.transform.position, 1.1f, Vector3.down, 10f);
+                foreach (RaycastHit h in hits)
+                {
+                    CubeMove target = h.collider.GetComponent<CubeMove>();
+                    if (target == null) continue;
+                    if (target.kind == CubeMove.CubeKind.Golden && sphere != null)
+                    {
+                        Vector3 spawnPos = new Vector3(
+                            Mathf.Round(target.transform.position.x),
+                            target.transform.position.y + 1f,
+                            Mathf.Round(target.transform.position.z)
+                        );
+                        _trigger.spawnedSpheres.Add(Instantiate(sphere, spawnPos, Quaternion.identity));
+                    }
+                    target.ReactToHit(true);
+                }
+                Destroy(bomb);
+            }
         }
 
         if (transform.position.y < -20)

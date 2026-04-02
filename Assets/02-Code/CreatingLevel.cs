@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class CreatingLevel : MonoBehaviour
 {
     public GameObject basicCube;
+    public GameObject goldenCube;
 
     public static float timer = 0f;
     private float advanceInterval = 3f;
@@ -66,6 +67,13 @@ public class CreatingLevel : MonoBehaviour
                     GameObject cube = Instantiate(basicCube, pos, Quaternion.identity);
                     CubeMove cm = cube.GetComponent<CubeMove>();
                     cm.kind = CubeMove.CubeKind.Basic;
+                    activeCubes.Add(cm);
+                }
+                else if (type == 2)
+                {
+                    GameObject cube = Instantiate(goldenCube, pos, Quaternion.identity);
+                    CubeMove cm = cube.GetComponent<CubeMove>();
+                    cm.kind = CubeMove.CubeKind.Golden;
                     activeCubes.Add(cm);
                 }
             }

@@ -10,7 +10,7 @@ public class CubeMove : MonoBehaviour
     public enum CubeKind
     {
         Basic    = 1,
-        Green    = 2,
+        Golden   = 2,
         Black    = 3,
         Platform = 4
     }
