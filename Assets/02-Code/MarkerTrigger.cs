@@ -33,9 +33,18 @@ public class MarkerTrigger : MonoBehaviour
                     Mathf.Round(col.transform.position.z)
                 );
                 spawnedSpheres.Add(Instantiate(spherePrefab, spawnPos, Quaternion.identity));
+                cube.ReactToHit(true);
             }
-
-            cube.ReactToHit(true);
+            else if (cube.kind == CubeMove.CubeKind.Black)
+            {
+                CreatingLevel level = FindObjectOfType<CreatingLevel>();
+                if (level != null) level.PenaltyAdvance();
+                cube.ReactToHit(false);
+            }
+            else
+            {
+                cube.ReactToHit(true);
+            }
         }
     }
 }

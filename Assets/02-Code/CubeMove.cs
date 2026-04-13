@@ -25,6 +25,8 @@ public class CubeMove : MonoBehaviour
     private float rollDuration = 0.5f;
     private Vector3 rollStartPos;
     private Quaternion rollStartRot;
+    private int queuedRolls = 0;
+    private float queuedRollSpeed = 1f;
 
     void Start()
     {
@@ -43,35 +45,115 @@ public class CubeMove : MonoBehaviour
             transform.rotation = Quaternion.Lerp(rollStartRot, rollStartRot * Quaternion.Euler(-90f, 0f, 0f), rollProgress);
 
             if (rollProgress >= 1f)
-                isRolling = false;
+            {
+                SnapToGrid();
+                SnapToRightAngles();
+
+                if (!HasSupportBelow())
+                {
+                    StartFalling();
+                }
+                else if (queuedRolls > 0)
+                {
+                    queuedRolls--;
+                    StartRoll(queuedRollSpeed);
+                }
+                else
+                {
+                    isRolling = false;
+                }
+            }
         }
 
-        if (!isRolling && _rb != null && _rb.isKinematic)
+        if (!isRolling && _rb != null && _rb.isKinematic && !HasSupportBelow())
         {
-            bool overPlatform = Physics.Raycast(transform.position, Vector3.down, 5f, LayerMask.GetMask("Default"));
-            if (!overPlatform)
-            {
-                _rb.isKinematic = false;
-                _rb.useGravity = true;
-            }
+            StartFalling();
         }
 
         if (transform.position.y < -20f)
         {
-            if ((int)kind != 4)
+            if (kind == CubeKind.Black)
+            {
+                blackFallen++;
                 destroyedMistake++;
+            }
+            else if (kind != CubeKind.Platform)
+            {
+                destroyedMistake++;
+            }
             Destroy(gameObject);
         }
     }
 
-    public void cubeAdvance(float speed)
+    public void cubeAdvance(float speed, bool force = false, int steps = 1)
     {
-        if (isRolling) return;
+        steps = Mathf.Max(1, steps);
+
+        if (isRolling && !force) return;
+
+        if (force)
+        {
+            SnapToGrid();
+            SnapToRightAngles();
+            isRolling = false;
+            queuedRolls = 0;
+        }
+
+        queuedRolls = steps - 1;
+        queuedRollSpeed = speed;
+        StartRoll(speed);
+    }
+
+    private void StartRoll(float speed)
+    {
         isRolling = true;
         rollProgress = 0f;
         rollDuration = 1f / speed;
         rollStartPos = transform.position;
         rollStartRot = transform.rotation;
+    }
+
+    private void StartFalling()
+    {
+        isRolling = false;
+        queuedRolls = 0;
+
+        if (_rb != null)
+        {
+            _rb.isKinematic = false;
+            _rb.useGravity = true;
+        }
+    }
+
+    private bool HasSupportBelow()
+    {
+        RaycastHit[] hits = Physics.RaycastAll(transform.position, Vector3.down, 1f);
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.collider == null || hit.collider.isTrigger) continue;
+            if (hit.collider.GetComponent<CubeMove>() != null) continue;
+            return true;
+        }
+        return false;
+    }
+
+    private void SnapToGrid()
+    {
+        transform.position = new Vector3(
+            Mathf.Round(transform.position.x),
+            Mathf.Round(transform.position.y * 2f) / 2f,
+            Mathf.Round(transform.position.z)
+        );
+    }
+
+    private void SnapToRightAngles()
+    {
+        Vector3 euler = transform.eulerAngles;
+        transform.rotation = Quaternion.Euler(
+            Mathf.Round(euler.x / 90f) * 90f,
+            Mathf.Round(euler.y / 90f) * 90f,
+            Mathf.Round(euler.z / 90f) * 90f
+        );
     }
 
     public void ReactToHit(bool success)

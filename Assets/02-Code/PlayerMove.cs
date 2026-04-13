@@ -74,7 +74,7 @@ public class PlayerMove : MonoBehaviour
             _trigger.Activate(1f, 1f);
         }
 
-        if (Input.GetKeyDown(KeyCode.E) && _trigger.spawnedSpheres.Count > 0)
+        if (Input.GetMouseButtonDown(2) && _trigger.spawnedSpheres.Count > 0)
         {
             List<GameObject> toDetonate = new List<GameObject>(_trigger.spawnedSpheres);
             _trigger.spawnedSpheres.Clear();
@@ -87,6 +87,7 @@ public class PlayerMove : MonoBehaviour
                 {
                     CubeMove target = h.collider.GetComponent<CubeMove>();
                     if (target == null) continue;
+
                     if (target.kind == CubeMove.CubeKind.Golden && sphere != null)
                     {
                         Vector3 spawnPos = new Vector3(
@@ -95,8 +96,18 @@ public class PlayerMove : MonoBehaviour
                             Mathf.Round(target.transform.position.z)
                         );
                         _trigger.spawnedSpheres.Add(Instantiate(sphere, spawnPos, Quaternion.identity));
+                        target.ReactToHit(true);
                     }
-                    target.ReactToHit(true);
+                    else if (target.kind == CubeMove.CubeKind.Black)
+                    {
+                        CreatingLevel creatingLevel = FindObjectOfType<CreatingLevel>();
+                        if (creatingLevel != null) creatingLevel.PenaltyAdvance();
+                        target.ReactToHit(false);
+                    }
+                    else
+                    {
+                        target.ReactToHit(true);
+                    }
                 }
                 Destroy(bomb);
             }

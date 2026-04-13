@@ -149,6 +149,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CreatingLevel
   basicCube: {fileID: 1076112741354546, guid: e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0, type: 3}
+  goldenCube: {fileID: 3568901248458363327, guid: b0776f17c536888479c809e89a507758,
+    type: 3}
+  blackCube: {fileID: 8376469784911875225, guid: a047b3521e38c1c4ab7a633e2bb7b428,
+    type: 3}
 --- !u!4 &237261173
 Transform:
   m_ObjectHideFlags: 0
@@ -425,6 +429,12 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 798176016213795370, guid: b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7,
+        type: 3}
+      propertyPath: sphere
+      value: 
+      objectReference: {fileID: 2716243761774851735, guid: 699af7409f88c938380f304de35520b7,
+        type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

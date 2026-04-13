@@ -5,10 +5,13 @@ public class CreatingLevel : MonoBehaviour
 {
     public GameObject basicCube;
     public GameObject goldenCube;
+    public GameObject blackCube;
 
     public static float timer = 0f;
     private float advanceInterval = 3f;
     private float cubeSpeed = 1f;
+    private float penaltyCubeSpeed = 3f;
+    private int penaltyAdvanceSteps = 3;
 
     private int currentLevel = 1;
     private List<CubeMove> activeCubes = new List<CubeMove>();
@@ -34,6 +37,14 @@ public class CreatingLevel : MonoBehaviour
         activeCubes.RemoveAll(c => c == null);
         foreach (CubeMove cube in activeCubes)
             cube.cubeAdvance(cubeSpeed);
+    }
+
+    public void PenaltyAdvance()
+    {
+        timer = 0f;
+        activeCubes.RemoveAll(c => c == null);
+        foreach (CubeMove cube in activeCubes)
+            cube.cubeAdvance(penaltyCubeSpeed, true, penaltyAdvanceSteps);
     }
 
     void SpawnWave()
@@ -74,6 +85,13 @@ public class CreatingLevel : MonoBehaviour
                     GameObject cube = Instantiate(goldenCube, pos, Quaternion.identity);
                     CubeMove cm = cube.GetComponent<CubeMove>();
                     cm.kind = CubeMove.CubeKind.Golden;
+                    activeCubes.Add(cm);
+                }
+                else if (type == 3 && blackCube != null)
+                {
+                    GameObject cube = Instantiate(blackCube, pos, Quaternion.identity);
+                    CubeMove cm = cube.GetComponent<CubeMove>();
+                    cm.kind = CubeMove.CubeKind.Black;
                     activeCubes.Add(cm);
                 }
             }
