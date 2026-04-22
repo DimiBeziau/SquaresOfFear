@@ -27,6 +27,11 @@ public class CubeMove : MonoBehaviour
     private Quaternion rollStartRot;
     private int queuedRolls = 0;
     private float queuedRollSpeed = 1f;
+    private bool isSpawning = false;
+    private float spawnProgress = 0f;
+    private float spawnDuration = 0.35f;
+    private float spawnStartY = 0f;
+    private float spawnTargetY = 0f;
 
     void Start()
     {
@@ -36,6 +41,20 @@ public class CubeMove : MonoBehaviour
 
     void Update()
     {
+        if (isSpawning)
+        {
+            spawnProgress += Time.deltaTime / spawnDuration;
+            float t = Mathf.Clamp01(spawnProgress);
+            Vector3 p = transform.position;
+            p.y = Mathf.Lerp(spawnStartY, spawnTargetY, t);
+            transform.position = p;
+
+            if (t < 1f) return;
+
+            isSpawning = false;
+            SnapToGrid();
+        }
+
         if (isRolling)
         {
             rollProgress += Time.deltaTime / rollDuration;
@@ -89,10 +108,19 @@ public class CubeMove : MonoBehaviour
     {
         steps = Mathf.Max(1, steps);
 
+        if (isSpawning && !force) return;
+
         if (isRolling && !force) return;
 
         if (force)
         {
+            if (isSpawning)
+            {
+                isSpawning = false;
+                Vector3 p = transform.position;
+                p.y = spawnTargetY;
+                transform.position = p;
+            }
             SnapToGrid();
             SnapToRightAngles();
             isRolling = false;
@@ -166,5 +194,27 @@ public class CubeMove : MonoBehaviour
 
         countAudio++;
         Destroy(gameObject);
+    }
+
+    public void PlaySpawnFromGround(float surfaceY, float riseDistance = 1f, float duration = 0.35f)
+    {
+        riseDistance = Mathf.Abs(riseDistance);
+        spawnDuration = Mathf.Max(0.01f, duration);
+        spawnTargetY = surfaceY;
+        spawnStartY = surfaceY - riseDistance;
+        spawnProgress = 0f;
+        isSpawning = true;
+
+        Vector3 p = transform.position;
+        p.y = spawnStartY;
+        transform.position = p;
+
+        if (_rb != null)
+        {
+            _rb.isKinematic = true;
+            _rb.useGravity = false;
+            _rb.linearVelocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+        }
     }
 }
