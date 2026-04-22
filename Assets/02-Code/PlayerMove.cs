@@ -26,6 +26,7 @@ public class PlayerMove : MonoBehaviour
     private AudioSource _audio;
     private AudioSource _audioRun;
     private bool _wasRunning = false;
+    private bool _gameOverTriggered = false;
 
     void Start()
     {
@@ -132,9 +133,9 @@ public class PlayerMove : MonoBehaviour
                     }
                     else if (target.kind == CubeMove.CubeKind.Black)
                     {
+                        target.ReactToHit(false);
                         CreatingLevel creatingLevel = FindFirstObjectByType<CreatingLevel>();
                         if (creatingLevel != null) creatingLevel.PenaltyAdvance();
-                        target.ReactToHit(false);
                     }
                     else
                     {
@@ -145,7 +146,14 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
-        if (transform.position.y < -20)
-            SceneManager.LoadScene("MainMenu");
+        if (!_gameOverTriggered && transform.position.y < -20)
+        {
+            _gameOverTriggered = true;
+            CreatingLevel creatingLevel = FindFirstObjectByType<CreatingLevel>();
+            if (creatingLevel != null)
+                creatingLevel.ShowGameOverMenu();
+            else
+                SceneManager.LoadScene("SquaresOfFear_scene");
+        }
     }
 }

@@ -6,9 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/MainMenu.unity
-    guid: 786cffe9a1a574439b047cd79eea3adc
-  - enabled: 1
     path: Assets/Scenes/SquaresOfFear_scene.unity
     guid: 8aaaff0b486014142bb1027f8d1f80f8
   m_configObjects: {}
