@@ -100,7 +100,7 @@ public class PlayerMove : MonoBehaviour
                     }
                     else if (target.kind == CubeMove.CubeKind.Black)
                     {
-                        CreatingLevel creatingLevel = FindObjectOfType<CreatingLevel>();
+                        CreatingLevel creatingLevel = FindFirstObjectByType<CreatingLevel>();
                         if (creatingLevel != null) creatingLevel.PenaltyAdvance();
                         target.ReactToHit(false);
                     }
@@ -114,6 +114,6 @@ public class PlayerMove : MonoBehaviour
         }
 
         if (transform.position.y < -20)
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+            SceneManager.LoadScene("MainMenu");
     }
 }
