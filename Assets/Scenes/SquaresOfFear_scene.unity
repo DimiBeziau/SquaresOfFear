@@ -153,6 +153,7 @@ MonoBehaviour:
     type: 3}
   blackCube: {fileID: 8376469784911875225, guid: a047b3521e38c1c4ab7a633e2bb7b428,
     type: 3}
+  platform: {fileID: 661606757}
 --- !u!4 &237261173
 Transform:
   m_ObjectHideFlags: 0
@@ -180,6 +181,7 @@ GameObject:
   - component: {fileID: 661606755}
   - component: {fileID: 661606754}
   - component: {fileID: 661606753}
+  - component: {fileID: 661606757}
   m_Layer: 0
   m_Name: Floor
   m_TagString: Untagged
@@ -280,6 +282,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &661606757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 661606752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlatformLength
+  platformCube: {fileID: 1000000000000001, guid: d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3,
+    type: 3}
 --- !u!1 &705146237
 GameObject:
   m_ObjectHideFlags: 0
@@ -451,6 +467,7 @@ GameObject:
   - component: {fileID: 1670257555}
   - component: {fileID: 1670257554}
   - component: {fileID: 1670257553}
+  - component: {fileID: 1670257556}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -532,6 +549,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &1670257556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1670257552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraScript
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
