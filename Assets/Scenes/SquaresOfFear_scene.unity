@@ -154,6 +154,9 @@ MonoBehaviour:
   blackCube: {fileID: 8376469784911875225, guid: a047b3521e38c1c4ab7a633e2bb7b428,
     type: 3}
   platform: {fileID: 661606757}
+  sfxStartLevel: {fileID: 8300000, guid: bf7b4081af3d09044aa5f95a190ccc08, type: 3}
+  sfxWin: {fileID: 8300000, guid: 1451abcf5c2c13d4b825c0dc28ac0631, type: 3}
+  sfxShowMalus: {fileID: 8300000, guid: 7214f13101abfd442b2addbfe0193b6a, type: 3}
 --- !u!4 &237261173
 Transform:
   m_ObjectHideFlags: 0
@@ -447,10 +450,40 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 798176016213795370, guid: b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7,
         type: 3}
+      propertyPath: sfxRun
+      value: 
+      objectReference: {fileID: 8300000, guid: a657cf0e308eb384496a45e4f309f110, type: 3}
+    - target: {fileID: 798176016213795370, guid: b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7,
+        type: 3}
       propertyPath: sphere
       value: 
       objectReference: {fileID: 2716243761774851735, guid: 699af7409f88c938380f304de35520b7,
         type: 3}
+    - target: {fileID: 798176016213795370, guid: b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7,
+        type: 3}
+      propertyPath: sfxMark
+      value: 
+      objectReference: {fileID: 8300000, guid: 21272b4ca577f2c49baa516cbc21935c, type: 3}
+    - target: {fileID: 798176016213795370, guid: b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7,
+        type: 3}
+      propertyPath: sfxBonus
+      value: 
+      objectReference: {fileID: 8300000, guid: bfff548edf4f57245be2ff9dc8880c11, type: 3}
+    - target: {fileID: 798176016213795370, guid: b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7,
+        type: 3}
+      propertyPath: sfxMalus
+      value: 
+      objectReference: {fileID: 8300000, guid: 72f1a42b3ba822647a40616f2cc45541, type: 3}
+    - target: {fileID: 798176016213795370, guid: b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7,
+        type: 3}
+      propertyPath: sfxClassic
+      value: 
+      objectReference: {fileID: 8300000, guid: 9d2cfc23cf2be0f4ca07cfd0e6f3fe58, type: 3}
+    - target: {fileID: 798176016213795370, guid: b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7,
+        type: 3}
+      propertyPath: sfxShowBonus
+      value: 
+      objectReference: {fileID: 8300000, guid: 74aff0d7c8f82ca4386a5700c11ad23d, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

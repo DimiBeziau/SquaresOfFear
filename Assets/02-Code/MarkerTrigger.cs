@@ -6,6 +6,18 @@ public class MarkerTrigger : MonoBehaviour
     public GameObject spherePrefab;
     public List<GameObject> spawnedSpheres = new List<GameObject>();
 
+    [Header("Audio")]
+    public AudioClip sfxBonus;
+    public AudioClip sfxMalus;
+    public AudioClip sfxClassic;
+    private AudioSource _audio;
+
+    void Awake()
+    {
+        _audio = GetComponent<AudioSource>();
+        if (_audio == null) _audio = gameObject.AddComponent<AudioSource>();
+    }
+
     public void Activate(float width = 1f, float depth = 1f)
     {
         Vector3 halfExtents = new Vector3(width / 2f, 1f, depth / 2f);
@@ -34,16 +46,19 @@ public class MarkerTrigger : MonoBehaviour
                 );
                 spawnedSpheres.Add(Instantiate(spherePrefab, spawnPos, Quaternion.identity));
                 cube.ReactToHit(true);
+                if (sfxBonus != null) _audio.PlayOneShot(sfxBonus);
             }
             else if (cube.kind == CubeMove.CubeKind.Black)
             {
                 CreatingLevel level = FindFirstObjectByType<CreatingLevel>();
                 if (level != null) level.PenaltyAdvance();
                 cube.ReactToHit(false);
+                if (sfxMalus != null) _audio.PlayOneShot(sfxMalus);
             }
             else
             {
                 cube.ReactToHit(true);
+                if (sfxClassic != null) _audio.PlayOneShot(sfxClassic);
             }
         }
     }

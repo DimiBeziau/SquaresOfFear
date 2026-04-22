@@ -10,6 +10,12 @@ public class CreatingLevel : MonoBehaviour
 
     public PlatformLength platform;
 
+    [Header("Audio")]
+    public AudioClip sfxStartLevel;
+    public AudioClip sfxWin;
+    public AudioClip sfxShowMalus;
+    private AudioSource _audio;
+
     public static float timer = 0f;
     private float advanceInterval = 3f;
     private float cubeSpeed = 1f;
@@ -27,6 +33,9 @@ public class CreatingLevel : MonoBehaviour
     {
         if (platform == null)
             Debug.LogError("[CreatingLevel] Le champ 'Platform' est vide ! Glisse Floor depuis la Hierarchy vers ce champ dans l'Inspector de LevelManager.");
+
+        _audio = GetComponent<AudioSource>();
+        if (_audio == null) _audio = gameObject.AddComponent<AudioSource>();
 
         SpawnWave();
     }
@@ -66,6 +75,7 @@ public class CreatingLevel : MonoBehaviour
         activeCubes.RemoveAll(c => c == null);
         foreach (CubeMove cube in activeCubes)
             cube.cubeAdvance(penaltyCubeSpeed, true, penaltyAdvanceSteps);
+        if (sfxShowMalus != null) _audio.PlayOneShot(sfxShowMalus);
     }
 
     IEnumerator EndWave()
@@ -88,7 +98,10 @@ public class CreatingLevel : MonoBehaviour
         if (platform != null)
         {
             if (allDestroyed)
+            {
                 StartCoroutine(platform.Enlargement());
+                if (sfxWin != null) _audio.PlayOneShot(sfxWin);
+            }
             else
                 platform.Decrease();
         }
@@ -113,6 +126,8 @@ public class CreatingLevel : MonoBehaviour
             Debug.LogWarning("Niveau introuvable : level" + currentLevel);
             return;
         }
+
+        if (sfxStartLevel != null) _audio.PlayOneShot(sfxStartLevel);
 
         Level level = JsonUtility.FromJson<Level>(jsonFile.text);
         string[] rows = level.wave.Split('/');
