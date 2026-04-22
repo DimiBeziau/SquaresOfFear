@@ -9,7 +9,7 @@ public class PlatformLength : MonoBehaviour
     {
         yield return new WaitForSeconds(3);
         transform.localScale += new Vector3(0, 0, 1f);
-        transform.Translate(0, 0, 0.5f);
+        transform.Translate(0, 0, -0.5f);
     }
 
     public void Decrease()

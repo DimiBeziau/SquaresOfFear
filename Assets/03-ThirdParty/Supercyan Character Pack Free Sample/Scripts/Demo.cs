@@ -9,7 +9,7 @@ public class Demo : MonoBehaviour {
 
     private void Start()
     {
-        m_animators = FindObjectsOfType<Animator>();
+        m_animators = FindObjectsByType<Animator>(FindObjectsSortMode.None);
     }
 
     private void Update()

@@ -13,17 +13,21 @@ public class CreatingLevel : MonoBehaviour
     public static float timer = 0f;
     private float advanceInterval = 3f;
     private float cubeSpeed = 1f;
-    private float penaltyCubeSpeed = 3f;
-    private int penaltyAdvanceSteps = 3;
+    private float penaltyCubeSpeed = 4f;
+    private int penaltyAdvanceSteps = 5;
 
     private int currentLevel = 1;
-    private int countToDestroy = 0; // basic + golden seulement
+    private const int maxLevel = 3;
+    private int countToDestroy = 0;
     private bool allDestroyed = false;
     private bool waveEnded = false;
     private List<CubeMove> activeCubes = new List<CubeMove>();
 
     void Start()
     {
+        if (platform == null)
+            Debug.LogError("[CreatingLevel] Le champ 'Platform' est vide ! Glisse Floor depuis la Hierarchy vers ce champ dans l'Inspector de LevelManager.");
+
         SpawnWave();
     }
 
@@ -37,18 +41,15 @@ public class CreatingLevel : MonoBehaviour
             AdvanceCubes();
         }
 
-        // Le joueur a détruit tous les blocs comptables (basic + golden)
         if (!allDestroyed && countToDestroy > 0 && CubeMove.destroyedCubes >= countToDestroy)
             allDestroyed = true;
 
-        // Vague terminée quand tous les basic+golden sont partis
-        // (détruits par le joueur OU tombés), sans compter les cubes noirs
         int nonBlackMistakes = CubeMove.destroyedMistake - CubeMove.blackFallen;
         int accounted = CubeMove.destroyedCubes + nonBlackMistakes;
         if (!waveEnded && countToDestroy > 0 && accounted >= countToDestroy)
         {
             waveEnded = true;
-            EndWave();
+            StartCoroutine(EndWave());
         }
     }
 
@@ -67,14 +68,23 @@ public class CreatingLevel : MonoBehaviour
             cube.cubeAdvance(penaltyCubeSpeed, true, penaltyAdvanceSteps);
     }
 
-    void EndWave()
+    IEnumerator EndWave()
     {
-        // Détruire les cubes encore en scène (cubes noirs restants)
+        // Avancer les cubes restants rapidement jusqu'à ce qu'ils tombent
+        activeCubes.RemoveAll(c => c == null);
+        foreach (CubeMove cube in activeCubes)
+            cube.cubeAdvance(penaltyCubeSpeed, true, penaltyAdvanceSteps);
+
+        // Laisser le temps à l'animation de se jouer
+        yield return new WaitForSeconds(2f);
+
+        // Détruire ceux qui n'auraient pas encore disparu
         activeCubes.RemoveAll(c => c == null);
         foreach (CubeMove cube in activeCubes)
             Destroy(cube.gameObject);
         activeCubes.Clear();
 
+        // Réaction de la plateforme
         if (platform != null)
         {
             if (allDestroyed)
@@ -89,6 +99,7 @@ public class CreatingLevel : MonoBehaviour
         CubeMove.countAudio = 0;
 
         currentLevel++;
+        if (currentLevel > maxLevel) currentLevel = 1;
         allDestroyed = false;
         waveEnded = false;
         SpawnWave();
@@ -105,28 +116,23 @@ public class CreatingLevel : MonoBehaviour
 
         Level level = JsonUtility.FromJson<Level>(jsonFile.text);
         string[] rows = level.wave.Split('/');
-
         int cols = rows[0].Split(' ').Length;
 
         if (platform != null)
         {
-            int prevWidth = platform.PlatformWidth(cols);
-            if (prevWidth != cols)
-            {
-                CameraScript cam = Camera.main.GetComponent<CameraScript>();
-                if (cam != null) cam.Posit(cols);
-            }
+            platform.PlatformWidth(cols);
+            CameraScript cam = FindObjectOfType<CameraScript>();
+            if (cam != null) cam.Posit(cols);
         }
 
         countToDestroy = 0;
-        float floorCenterX = 1.5f;
         float floorSurfaceY = 1.5f;
         float zStart = 11f;
 
         for (int z = 0; z < rows.Length; z++)
         {
             string[] colValues = rows[z].Split(' ');
-            float xOffset = Mathf.Round(floorCenterX - (colValues.Length - 1) / 2f);
+            float xOffset = 0f;
 
             for (int x = 0; x < colValues.Length; x++)
             {

@@ -37,7 +37,7 @@ public class MarkerTrigger : MonoBehaviour
             }
             else if (cube.kind == CubeMove.CubeKind.Black)
             {
-                CreatingLevel level = FindObjectOfType<CreatingLevel>();
+                CreatingLevel level = FindFirstObjectByType<CreatingLevel>();
                 if (level != null) level.PenaltyAdvance();
                 cube.ReactToHit(false);
             }
