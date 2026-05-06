@@ -190,8 +190,13 @@ public class CubeMove : MonoBehaviour
         if (destroyed) return;
         destroyed = true;
 
-        if (success) destroyedCubes++;
-        else         destroyedMistake++;
+        if (kind == CubeKind.Black)
+        {
+            blackFallen++;
+            destroyedMistake++;
+        }
+        else if (success) destroyedCubes++;
+        else              destroyedMistake++;
 
         countAudio++;
         Destroy(gameObject);
