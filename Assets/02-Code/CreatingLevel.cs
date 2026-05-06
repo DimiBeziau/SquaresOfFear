@@ -35,6 +35,7 @@ public class CreatingLevel : MonoBehaviour
     private int currentLevel = 1;
     private const int maxLevel = 3;
     private int countToDestroy = 0;
+    private int countBlack = 0;
     private bool allDestroyed = false;
     private bool waveEnded = false;
     private List<CubeMove> activeCubes = new List<CubeMove>();
@@ -75,12 +76,13 @@ public class CreatingLevel : MonoBehaviour
             AdvanceCubes();
         }
 
-        if (!allDestroyed && countToDestroy > 0 && CubeMove.destroyedCubes >= countToDestroy)
+        bool allBasicGoldenDestroyed = countToDestroy > 0 && CubeMove.destroyedCubes >= countToDestroy;
+        bool allBlackFallen = CubeMove.blackFallen >= countBlack;
+
+        if (!allDestroyed && allBasicGoldenDestroyed)
             allDestroyed = true;
 
-        int nonBlackMistakes = CubeMove.destroyedMistake - CubeMove.blackFallen;
-        int accounted = CubeMove.destroyedCubes + nonBlackMistakes;
-        if (!waveEnded && countToDestroy > 0 && accounted >= countToDestroy)
+        if (!waveEnded && allBasicGoldenDestroyed && allBlackFallen)
         {
             waveEnded = true;
             StartCoroutine(EndWave());
@@ -101,6 +103,9 @@ public class CreatingLevel : MonoBehaviour
         activeCubes.RemoveAll(c => c == null);
         foreach (CubeMove cube in activeCubes)
             cube.cubeAdvance(penaltyCubeSpeed, true, penaltySteps);
+
+        PlayerMove player = FindFirstObjectByType<PlayerMove>();
+        if (player != null) player.ClearMark();
         if (sfxShowMalus != null) _audio.PlayOneShot(sfxShowMalus);
     }
 
@@ -124,17 +129,7 @@ public class CreatingLevel : MonoBehaviour
             Destroy(cube.gameObject);
         activeCubes.Clear();
 
-        // Réaction de la plateforme
-        if (platform != null)
-        {
-            if (allDestroyed)
-            {
-                StartCoroutine(platform.Enlargement());
-                if (sfxWin != null) _audio.PlayOneShot(sfxWin);
-            }
-            else
-                platform.Decrease();
-        }
+        if (sfxWin != null) _audio.PlayOneShot(sfxWin);
 
         CubeMove.destroyedCubes = 0;
         CubeMove.destroyedMistake = 0;
@@ -184,6 +179,7 @@ public class CreatingLevel : MonoBehaviour
         }
 
         countToDestroy = 0;
+        countBlack = 0;
         float floorSurfaceY = 1.5f;
         float zStart = 11f;
 
@@ -213,6 +209,7 @@ public class CreatingLevel : MonoBehaviour
                 {
                     GameObject cube = Instantiate(blackCube, pos, Quaternion.identity);
                     RegisterSpawnedCube(cube, floorSurfaceY);
+                    countBlack++;
                 }
             }
         }
@@ -419,6 +416,11 @@ public class CreatingLevel : MonoBehaviour
 
     void RestartGame()
     {
+        CubeMove.destroyedCubes = 0;
+        CubeMove.destroyedMistake = 0;
+        CubeMove.blackFallen = 0;
+        CubeMove.countAudio = 0;
+        timer = 0f;
         SceneManager.LoadScene("SquaresOfFear_scene");
     }
 

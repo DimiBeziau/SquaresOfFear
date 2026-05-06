@@ -156,4 +156,10 @@ public class PlayerMove : MonoBehaviour
                 SceneManager.LoadScene("SquaresOfFear_scene");
         }
     }
+
+    public void ClearMark()
+    {
+        Destroy(plane);
+        plane = null;
+    }
 }
