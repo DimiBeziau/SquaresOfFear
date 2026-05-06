@@ -12,8 +12,13 @@ public class PlatformLength : MonoBehaviour
     private BoxCollider farWall;
     private Collider platformCollider;
 
+    [SerializeField] private int playerSideExtension = 2;
+
     void Start()
     {
+        transform.localScale += new Vector3(0, 0, playerSideExtension);
+        transform.position += new Vector3(0, 0, -playerSideExtension * 0.5f);
+
         platformCollider = GetComponent<Collider>();
         CreateInvisibleWalls();
         UpdateInvisibleWalls();
