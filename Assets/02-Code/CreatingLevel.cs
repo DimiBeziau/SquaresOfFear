@@ -29,6 +29,7 @@ public class CreatingLevel : MonoBehaviour
     private int blackPenaltyMinSteps = 1;
     private int blackPenaltyMaxSteps = 2;
     private int endWaveAdvanceSteps = 5;
+    private int blackOnlyAccelerateSteps = 12;
     private float successEndWaveAdvanceMultiplier = 1.5f;
     private float spawnRiseDistance = 1f;
     private float spawnRiseDuration = 0.35f;
@@ -86,7 +87,10 @@ public class CreatingLevel : MonoBehaviour
         bool allBlackFallen = CubeMove.blackFallen >= countBlack;
 
         if (!allDestroyed && allBasicGoldenDestroyed)
+        {
             allDestroyed = true;
+            AccelerateBlackCubes();
+        }
 
         if (!waveEnded && allBasicGoldenDestroyed && allBlackFallen)
         {
@@ -121,6 +125,16 @@ public class CreatingLevel : MonoBehaviour
         if (sfxShowMalus != null) _audio.PlayOneShot(sfxShowMalus);
     }
 
+    void AccelerateBlackCubes()
+    {
+        activeCubes.RemoveAll(c => c == null);
+        foreach (CubeMove cube in activeCubes)
+        {
+            if (cube.kind == CubeMove.CubeKind.Black)
+                cube.cubeAdvance(penaltyCubeSpeed, true, blackOnlyAccelerateSteps);
+        }
+    }
+
     IEnumerator EndWave()
     {
         // Avancer les cubes restants rapidement jusqu'à ce qu'ils tombent
@@ -149,10 +163,16 @@ public class CreatingLevel : MonoBehaviour
         CubeMove.countAudio = 0;
 
         int completedLevel = currentLevel;
-        currentLevel++;
-        if (currentLevel > maxLevel) currentLevel = 1;
         allDestroyed = false;
         waveEnded = false;
+
+        if (completedLevel >= maxLevel)
+        {
+            ShowInterLevelMenu(completedLevel, -1);
+            yield break;
+        }
+
+        currentLevel++;
         ShowInterLevelMenu(completedLevel, currentLevel);
     }
 
@@ -187,7 +207,7 @@ public class CreatingLevel : MonoBehaviour
         if (platform != null)
         {
             platform.PlatformWidth(cols);
-            CameraScript cam = FindObjectOfType<CameraScript>();
+            CameraScript cam = FindFirstObjectByType<CameraScript>();
             if (cam != null) cam.Posit(cols);
         }
 
@@ -246,14 +266,12 @@ public class CreatingLevel : MonoBehaviour
         string completedLevelTime = FormatDuration(levelElapsedTime);
         string timesSummary = BuildTimesSummary();
 
-        string titleText = completedLevel == maxLevel
-            ? "Niveau " + completedLevel + " termine !\nTemps du niveau : " + completedLevelTime + "\n\n" + timesSummary + "\n\nTu as fini la sequence.\nAppuie sur Continuer pour recommencer."
+        string titleText = nextLevel == -1
+            ? "Niveau " + completedLevel + " termine !\nTemps du niveau : " + completedLevelTime + "\n\n" + timesSummary + "\n\nBravo, tu as termine tous les niveaux !"
             : "Niveau " + completedLevel + " termine !\nTemps du niveau : " + completedLevelTime + "\n\n" + timesSummary + "\n\nProchain niveau : " + nextLevel;
 
-        if (completedLevel == maxLevel)
-            clearTimesOnNextWave = true;
-
-        ShowOverlayMenu(titleText, "Continuer", ContinueToNextLevel);
+        Action onContinue = nextLevel == -1 ? (Action)ReturnToMainMenu : ContinueToNextLevel;
+        ShowOverlayMenu(titleText, "Continuer", onContinue);
     }
 
     void CreateTimerHUD()
@@ -425,6 +443,16 @@ public class CreatingLevel : MonoBehaviour
     void ContinueToNextLevel()
     {
         SpawnWave();
+    }
+
+    void ReturnToMainMenu()
+    {
+        CubeMove.destroyedCubes = 0;
+        CubeMove.destroyedMistake = 0;
+        CubeMove.blackFallen = 0;
+        CubeMove.countAudio = 0;
+        timer = 0f;
+        SceneManager.LoadScene("MainMenu");
     }
 
     void RestartGame()
