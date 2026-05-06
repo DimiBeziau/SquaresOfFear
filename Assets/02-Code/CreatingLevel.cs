@@ -22,6 +22,7 @@ public class CreatingLevel : MonoBehaviour
     private AudioSource _audio;
 
     public static float timer = 0f;
+    private bool timerActive = false;
     private float advanceInterval = 3f;
     private float cubeSpeed = 1f;
     private float penaltyCubeSpeed = 4f;
@@ -48,6 +49,11 @@ public class CreatingLevel : MonoBehaviour
     private readonly Dictionary<int, float> lastLevelTimes = new Dictionary<int, float>();
     private bool clearTimesOnNextWave = false;
 
+    void Awake()
+    {
+        timer = 0f;
+    }
+
     void Start()
     {
         if (platform == null)
@@ -62,7 +68,7 @@ public class CreatingLevel : MonoBehaviour
 
     void Update()
     {
-        if (!waitingForMenuAction)
+        if (!waitingForMenuAction && timerActive)
         {
             levelElapsedTime += Time.deltaTime;
             UpdateTimerText();
@@ -91,6 +97,12 @@ public class CreatingLevel : MonoBehaviour
 
     void AdvanceCubes()
     {
+        if (!timerActive)
+        {
+            timerActive = true;
+            if (hudCanvas != null) hudCanvas.SetActive(true);
+            UpdateTimerText();
+        }
         activeCubes.RemoveAll(c => c == null);
         foreach (CubeMove cube in activeCubes)
             cube.cubeAdvance(cubeSpeed);
@@ -156,8 +168,9 @@ public class CreatingLevel : MonoBehaviour
         }
 
         timer = 0f;
+        timerActive = false;
         levelElapsedTime = 0f;
-        UpdateTimerText();
+        if (hudCanvas != null) hudCanvas.SetActive(false);
         TextAsset jsonFile = Resources.Load<TextAsset>("level" + currentLevel);
         if (jsonFile == null)
         {
