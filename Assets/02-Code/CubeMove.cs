@@ -96,9 +96,10 @@ public class CubeMove : MonoBehaviour
                 blackFallen++;
                 destroyedMistake++;
             }
-            else if (kind != CubeKind.Platform)
+            else if (kind == CubeKind.Basic || kind == CubeKind.Golden)
             {
-                destroyedMistake++;
+                CreatingLevel levelManager = FindFirstObjectByType<CreatingLevel>();
+                if (levelManager != null) levelManager.ShowGameOverMenu();
             }
             Destroy(gameObject);
         }
